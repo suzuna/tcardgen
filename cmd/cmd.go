@@ -11,10 +11,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Ladicle/tcardgen/pkg/canvas"
-	"github.com/Ladicle/tcardgen/pkg/canvas/fontfamily"
-	"github.com/Ladicle/tcardgen/pkg/config"
-	"github.com/Ladicle/tcardgen/pkg/hugo"
+	"github.com/suzuna/tcardgen/pkg/canvas"
+	"github.com/suzuna/tcardgen/pkg/canvas/fontfamily"
+	"github.com/suzuna/tcardgen/pkg/config"
+	"github.com/suzuna/tcardgen/pkg/hugo"
 )
 
 const (
@@ -188,30 +188,10 @@ func generateTCard(contentPath, outPath string, tpl image.Image, ffa *fontfamily
 		return err
 	}
 	if err := c.DrawTextAtPoint(
-		strings.ToUpper(fm.Category),
-		*cnf.Category.Start,
-		canvas.FgHexColor(cnf.Category.FgHexColor),
-		canvas.FontFaceFromFFA(ffa, cnf.Category.FontStyle, cnf.Category.FontSize),
-	); err != nil {
-		return err
-	}
-	if err := c.DrawTextAtPoint(
-		fmt.Sprintf("%s%s%s", fm.Author, cnf.Info.Separator, fm.Date.Format("Jan 2")),
+		fmt.Sprintf("%s%s%s", fm.Author, cnf.Info.Separator, fm.Date.Format("2006/1/2")),
 		*cnf.Info.Start,
 		canvas.FgHexColor(cnf.Info.FgHexColor),
 		canvas.FontFaceFromFFA(ffa, cnf.Info.FontStyle, cnf.Info.FontSize),
-	); err != nil {
-		return err
-	}
-	if err := c.DrawBoxTexts(
-		tags,
-		*cnf.Tags.Start,
-		canvas.FgHexColor(cnf.Tags.FgHexColor),
-		canvas.BgHexColor(cnf.Tags.BgHexColor),
-		canvas.BoxPadding(*cnf.Tags.BoxPadding),
-		canvas.BoxSpacing(*cnf.Tags.BoxSpacing),
-		canvas.BoxAlign(cnf.Tags.BoxAlign),
-		canvas.FontFaceFromFFA(ffa, cnf.Tags.FontStyle, cnf.Tags.FontSize),
 	); err != nil {
 		return err
 	}
