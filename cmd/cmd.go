@@ -55,6 +55,7 @@ type RootCommandOption struct {
 	output  string
 	tplImg  string
 	config  string
+	topTitle string
 }
 
 func NewRootCmd() *cobra.Command {
@@ -84,6 +85,7 @@ func NewRootCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&opt.output, "output", "o", defaultOutput, "Set an output directory or filename (only png format).")
 	cmd.Flags().StringVarP(&opt.tplImg, "template", "t", "", fmt.Sprintf("Set a template image file. (default %s)", config.DefaultTemplate))
 	cmd.Flags().StringVarP(&opt.config, "config", "c", "", "Set a drawing configuration file.")
+	cmd.Flags().StringVarP(&opt.topTitle, "topTitle", "s", "", "Set a toptitle.")
 	return cmd
 }
 
@@ -147,7 +149,7 @@ func (o *RootCommandOption) Run(streams IOStreams) error {
 			out += fmt.Sprintf("/%s.png", base[:len(base)-len(filepath.Ext(base))])
 		}
 
-		if err := generateTCard(f, out, tpl, ffa, cnf); err != nil {
+		if err := generateTCard(f, out, tpl, ffa, cnf, o.topTitle); err != nil {
 			fmt.Fprintf(streams.ErrOut, "Failed to generate twitter card for %v: %v\n", out, err)
 			errCnt++
 			continue
@@ -161,7 +163,7 @@ func (o *RootCommandOption) Run(streams IOStreams) error {
 	return nil
 }
 
-func generateTCard(contentPath, outPath string, tpl image.Image, ffa *fontfamily.FontFamily, cnf *config.DrawingConfig) error {
+func generateTCard(contentPath, outPath string, tpl image.Image, ffa *fontfamily.FontFamily, cnf *config.DrawingConfig, topTitle string) error {
 	fm, err := hugo.ParseFrontMatter(contentPath)
 	if err != nil {
 		return err
@@ -184,6 +186,15 @@ func generateTCard(contentPath, outPath string, tpl image.Image, ffa *fontfamily
 		canvas.LineSpacing(*cnf.Title.LineSpacing),
 		canvas.FgHexColor(cnf.Title.FgHexColor),
 		canvas.FontFaceFromFFA(ffa, cnf.Title.FontStyle, cnf.Title.FontSize),
+	); err != nil {
+		return err
+	}
+
+	if err := c.DrawTextAtPoint(
+		topTitle,
+		*cnf.Category.Start,
+		canvas.FgHexColor(cnf.Category.FgHexColor),
+		canvas.FontFaceFromFFA(ffa, cnf.Category.FontStyle, cnf.Category.FontSize),
 	); err != nil {
 		return err
 	}
