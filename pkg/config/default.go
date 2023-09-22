@@ -25,7 +25,7 @@ var defaultCnf = DrawingConfig{
 		FontStyle:  fontfamily.Regular,
 	},
 	Info: &TextOption{
-		Start:      &Point{X: 227, Y: 441},
+		Start:      &Point{X: 123, Y: 441},
 		FgHexColor: "#8D8D8D",
 		FontSize:   38,
 		FontStyle:  fontfamily.Regular,
