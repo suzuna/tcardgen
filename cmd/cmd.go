@@ -56,6 +56,7 @@ type RootCommandOption struct {
 	tplImg  string
 	config  string
 	topTitle string
+	bottomAuthor string
 }
 
 func NewRootCmd() *cobra.Command {
@@ -85,7 +86,8 @@ func NewRootCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&opt.output, "output", "o", defaultOutput, "Set an output directory or filename (only png format).")
 	cmd.Flags().StringVarP(&opt.tplImg, "template", "t", "", fmt.Sprintf("Set a template image file. (default %s)", config.DefaultTemplate))
 	cmd.Flags().StringVarP(&opt.config, "config", "c", "", "Set a drawing configuration file.")
-	cmd.Flags().StringVarP(&opt.topTitle, "topTitle", "s", "", "Set a toptitle.")
+	cmd.Flags().StringVarP(&opt.topTitle, "topTitle", "s", "", "Set a toptitle (insert instead of category).")
+	cmd.Flags().StringVarP(&opt.bottomAuthor, "bottomAuthor", "a", "", "Set a bottomAuthor (insert instead of author).")
 	return cmd
 }
 
@@ -149,7 +151,7 @@ func (o *RootCommandOption) Run(streams IOStreams) error {
 			out += fmt.Sprintf("/%s.png", base[:len(base)-len(filepath.Ext(base))])
 		}
 
-		if err := generateTCard(f, out, tpl, ffa, cnf, o.topTitle); err != nil {
+		if err := generateTCard(f, out, tpl, ffa, cnf, o.topTitle, o.bottomAuthor); err != nil {
 			fmt.Fprintf(streams.ErrOut, "Failed to generate twitter card for %v: %v\n", out, err)
 			errCnt++
 			continue
@@ -163,7 +165,7 @@ func (o *RootCommandOption) Run(streams IOStreams) error {
 	return nil
 }
 
-func generateTCard(contentPath, outPath string, tpl image.Image, ffa *fontfamily.FontFamily, cnf *config.DrawingConfig, topTitle string) error {
+func generateTCard(contentPath, outPath string, tpl image.Image, ffa *fontfamily.FontFamily, cnf *config.DrawingConfig, topTitle string, bottomAuthor string) error {
 	fm, err := hugo.ParseFrontMatter(contentPath)
 	if err != nil {
 		return err
@@ -199,7 +201,7 @@ func generateTCard(contentPath, outPath string, tpl image.Image, ffa *fontfamily
 		return err
 	}
 	if err := c.DrawTextAtPoint(
-		fm.Author,
+		bottomAuthor,
 		*cnf.Info.Start,
 		canvas.FgHexColor(cnf.Info.FgHexColor),
 		canvas.FontFaceFromFFA(ffa, cnf.Info.FontStyle, cnf.Info.FontSize),
