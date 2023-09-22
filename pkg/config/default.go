@@ -12,7 +12,7 @@ var defaultCnf = DrawingConfig{
 		TextOption: TextOption{
 			Start:      &Point{X: 123, Y: 165},
 			FgHexColor: "#000000",
-			FontSize:   72,
+			FontSize:   60,
 			FontStyle:  fontfamily.Bold,
 		},
 		MaxWidth:    946,
